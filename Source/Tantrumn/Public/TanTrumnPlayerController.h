@@ -12,25 +12,43 @@ class UInputAction;
 class UInputMappingContext;
 class ATanTrumnCharacterBase;
 struct  FInputActionValue;
+class ATanTrumnCharacterBase;
+class UTanTrumCharacterMovementComp;
+//class UTanTrumnCharacterMovementComp;
 UCLASS()
 class TANTRUMN_API ATanTrumnPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
 public:
-	ATanTrumnPlayerController();
-
+	ATanTrumnPlayerController(const FObjectInitializer& obj);
+	bool Sprint;
+	bool bInputAxis;
 protected:
+	float GroundCheckDistance = 100.0f;
 	void Move(const FInputActionValue& Value);
 	void CameraLook(const FInputActionValue& Value);
 	void PlayerJump(const FInputActionValue& Value);
+	void PlayerStartSprinting(const FInputActionValue& Value);
+	void PlayerStartCrouch(const FInputActionValue& Value);
+	void PlayerEndCrouch(const FInputActionValue& Value);
 	void SetupInputComponent();
-	
-	
+	void Walking();
+	void Sprinting();
+	void StopJumping();
 	virtual void BeginPlay() override;
 private:
 	UPROPERTY(EditDefaultsOnly)
+	float SprintSpeed;
+
+
+	UPROPERTY(EditDefaultsOnly)
+	UTanTrumCharacterMovementComp* moveComp;
+	UPROPERTY(EditDefaultsOnly)
 	ATanTrumnCharacterBase* PC;
+	float JumpCooldownTime = 1.9f; // Cooldown duration in seconds
+	float LastJumpTime = 0.0f;
+	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* InputMapping;
@@ -44,4 +62,12 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction*JumpAction;
+	
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction*SprintAction;
+	
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction*CrouchAction;
 };

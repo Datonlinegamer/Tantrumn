@@ -15,14 +15,27 @@ class TANTRUMN_API ATanTrumnCharacterBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ATanTrumnCharacterBase();
-
+	bool bCrouch;
+	void BaseCharacterCrouch();
+	void BaseCharacterUnCrouch();
+	virtual void Landed(const FHitResult& Hit)override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 
-
 private: 
+
+	UPROPERTY(EditAnywhere, Category = "FallImpact")
+	float MinImpactSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "FallImpact")
+	float MaxImpactSpeed;
+
+	bool bAffectLarge;
+	bool bAffectSmall;
+
+	APlayerController* PController;
 	UPROPERTY(EditDefaultsOnly, Category = "CameraStuff")
 	UCameraComponent* Camera;
 
