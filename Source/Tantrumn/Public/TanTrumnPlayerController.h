@@ -24,19 +24,25 @@ public:
 	ATanTrumnPlayerController(const FObjectInitializer& obj);
 	bool Sprint;
 	bool bInputAxis;
+	bool pull;
 protected:
 	float GroundCheckDistance = 100.0f;
 	void Move(const FInputActionValue& Value);
 	void CameraLook(const FInputActionValue& Value);
 	void PlayerJump(const FInputActionValue& Value);
 	void PlayerStartSprinting(const FInputActionValue& Value);
-	void PlayerStartCrouch(const FInputActionValue& Value);
-	void PlayerEndCrouch(const FInputActionValue& Value);
+	void PlayerThrowObject(const FInputActionValue& Value);
+	
+
+	
+	void RequestPullObjectStart(const FInputActionValue& Value);
 	void SetupInputComponent();
 	void Walking();
 	void Sprinting();
 	void StopJumping();
+	void ToggleCrouch();
 	virtual void BeginPlay() override;
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	float SprintSpeed;
@@ -48,26 +54,35 @@ private:
 	ATanTrumnCharacterBase* PC;
 	float JumpCooldownTime = 1.9f; // Cooldown duration in seconds
 	float LastJumpTime = 0.0f;
-	
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* InputMapping;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
-	
-	
+
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
-	UInputAction*CameraLookAction;
-	
+	UInputAction* CameraLookAction;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
-	UInputAction*JumpAction;
-	
-	
+	UInputAction* JumpAction;
+
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
-	UInputAction*SprintAction;
-	
-	
+	UInputAction* SprintAction;
+
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
-	UInputAction*CrouchAction;
+	UInputAction* CrouchAction;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* PullAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* ThrowAction;
 };
+
+

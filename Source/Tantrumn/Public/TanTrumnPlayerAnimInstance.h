@@ -17,7 +17,7 @@ class TANTRUMN_API UTanTrumnPlayerAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
-
+	
 
 	UTanTrumnPlayerAnimInstance();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Generic")
@@ -29,6 +29,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
 	bool bIsInAir;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
+	bool Interact;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
 	bool isAiming;

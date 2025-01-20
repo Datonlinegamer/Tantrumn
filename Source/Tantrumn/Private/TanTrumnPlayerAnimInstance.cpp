@@ -7,6 +7,7 @@
 UTanTrumnPlayerAnimInstance::UTanTrumnPlayerAnimInstance()
 	:bIsInAir(false)
 	,Crouch(false)
+	,Interact(false)
 {
 
 
@@ -25,17 +26,16 @@ void UTanTrumnPlayerAnimInstance::PlayerMoveVelocity()
 		bAccelerating = Player->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.0f;
 		bIsInAir = Player->GetCharacterMovement()->IsFalling();
 
-		if (Player->bCrouch&& !Crouch)
+		
+		Crouch = Player->bIsCrouched;
+
+		if (!Player->IsPullingObject())
 		{
-			Crouch = true;
+			Interact =false;
 		}
 		else
 		{
-			if (Player->bCrouch !=false && Crouch)
-			{
-				Crouch = false;
-				
-			}
+			Interact = true;
 		}
 	}
 }

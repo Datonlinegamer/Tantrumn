@@ -100,7 +100,7 @@ void ATanTrumnPlayerController::PlayerJump(const FInputActionValue& Value)
 
         UE_LOG(LogTemp, Log, TEXT("Player jumped."));
 
-        if (PC->bCrouch)
+        if (PC->bIsCrouched)
         {
             PC->StopJumping();
         }
@@ -130,30 +130,7 @@ void ATanTrumnPlayerController::PlayerStartSprinting(const FInputActionValue& Va
     }
 }
 
-void ATanTrumnPlayerController::PlayerStartCrouch(const FInputActionValue& Value)
-{
 
-    PC->bCrouch = Value.Get<bool>();
-
-    if (!PC->CanCrouch() == false) // Player is crouching
-    {   
-        PC->BaseCharacterCrouch();
-        PC->GetCharacterMovement()->MaxWalkSpeed = 200.0f; // Reduce speed while crouching
-        // Halve the default capsule height
-    }
-}
-
-void ATanTrumnPlayerController::PlayerEndCrouch(const FInputActionValue& Value)
-{
-    PC->bCrouch = Value.Get<bool>();
-    if (PC->CanCrouch() != false)
-    {
-        
-        PC->BaseCharacterUnCrouch();
-        PC->GetCharacterMovement()->MaxWalkSpeed = 500.0f; // Restore walking speed
-
-    }
-}
 
 void ATanTrumnPlayerController::Walking()
 {
@@ -183,6 +160,39 @@ void ATanTrumnPlayerController::StopJumping()
     }
 }
 
+void ATanTrumnPlayerController::ToggleCrouch()
+{
+    if (PC->bIsCrouched)
+    {
+        PC->BaseCharacterUnCrouch();
+    }
+    else
+    {
+        PC->BaseCharacterCrouch();
+    }
+}
+void ATanTrumnPlayerController::RequestPullObjectStart(const FInputActionValue& Value)
+{
+
+    if (!PC->IsPullingObject())
+    {
+        PC->RequestPullObjectStart();
+    }
+    else
+    {
+
+        PC->RequestPullObjectStop();
+    }
+}
+
+void ATanTrumnPlayerController::PlayerThrowObject(const FInputActionValue& Value)
+{
+    if (PC->CanThrowObject())
+    {
+        PC->PlayThrowMontage();
+    }
+}
+
 void ATanTrumnPlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
@@ -195,7 +205,10 @@ void ATanTrumnPlayerController::SetupInputComponent()
         Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ATanTrumnPlayerController::PlayerJump);
         Input->BindAction(SprintAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::PlayerStartSprinting);
         Input->BindAction(SprintAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::PlayerStartSprinting);
-        Input->BindAction(CrouchAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::PlayerStartCrouch);
-        Input->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::PlayerEndCrouch);
+        Input->BindAction(CrouchAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::ToggleCrouch);
+        Input->BindAction(PullAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::RequestPullObjectStart);
+        Input->BindAction(PullAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::RequestPullObjectStart);
+        Input->BindAction(ThrowAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::PlayerThrowObject);
+        
     }
 }
