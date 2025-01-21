@@ -7,7 +7,7 @@
 /**
  * 
  */
-
+class ATantrumnGameModeBase;
 class UInputAction;
 class UInputMappingContext;
 class ATanTrumnCharacterBase;
@@ -83,6 +83,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* ThrowAction;
+
+
+	ATantrumnGameModeBase* GameModeRef;
 };
 
 

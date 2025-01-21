@@ -12,6 +12,7 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "TantrumnGameModeBase.h"
 
 ATanTrumnPlayerController::ATanTrumnPlayerController(const FObjectInitializer& obj)
     : Super(obj), Sprint(false)
@@ -25,6 +26,8 @@ void ATanTrumnPlayerController::BeginPlay()
     Super::BeginPlay();
 
     PC = Cast<ATanTrumnCharacterBase>(GetPawn());
+    GameModeRef = Cast<ATantrumnGameModeBase>(GetWorld()->GetAuthGameMode());
+   
     if (PC)
     {
         Walking();
@@ -52,6 +55,7 @@ void ATanTrumnPlayerController::BeginPlay()
 void ATanTrumnPlayerController::Move(const FInputActionValue& Value)
 {
     if (!PC) return;
+    if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
 
     FVector2D Input = Value.Get<FVector2D>();
     const FRotator Rotate = GetControlRotation();
@@ -75,6 +79,7 @@ void ATanTrumnPlayerController::CameraLook(const FInputActionValue& Value)
 void ATanTrumnPlayerController::PlayerJump(const FInputActionValue& Value)
 {
     bInputAxis = Value.Get<bool>();
+    if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
     if (!PC) // Ensure PC is valid
     {
         UE_LOG(LogTemp, Error, TEXT("PlayerCharacter reference (PC) is null."));
@@ -117,9 +122,10 @@ void ATanTrumnPlayerController::PlayerJump(const FInputActionValue& Value)
 void ATanTrumnPlayerController::PlayerStartSprinting(const FInputActionValue& Value)
 {
     Sprint = Value.Get<bool>();
+    if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
     if (PC)
     {
-        if (Sprint)
+          if (Sprint)
         {
             Sprinting();
         }
@@ -154,6 +160,7 @@ void ATanTrumnPlayerController::Sprinting()
 
 void ATanTrumnPlayerController::StopJumping()
 {
+    if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
     if (PC)
     {
         PC->StopJumping();
@@ -162,6 +169,7 @@ void ATanTrumnPlayerController::StopJumping()
 
 void ATanTrumnPlayerController::ToggleCrouch()
 {
+    if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
     if (PC->bIsCrouched)
     {
         PC->BaseCharacterUnCrouch();
@@ -173,7 +181,7 @@ void ATanTrumnPlayerController::ToggleCrouch()
 }
 void ATanTrumnPlayerController::RequestPullObjectStart(const FInputActionValue& Value)
 {
-
+    if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
     if (!PC->IsPullingObject())
     {
         PC->RequestPullObjectStart();

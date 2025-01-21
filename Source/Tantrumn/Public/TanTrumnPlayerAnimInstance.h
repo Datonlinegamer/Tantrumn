@@ -9,8 +9,10 @@
 /**
  * 
  */
-class ATanTrumnCharacterBase;
 
+
+class ATanTrumnCharacterBase;
+class ATantrumnGameModeBase;
 UCLASS()
 class TANTRUMN_API UTanTrumnPlayerAnimInstance : public UAnimInstance
 {
@@ -42,11 +44,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
 	bool Crouch;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
+	 bool Hovering;
 protected:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	virtual void NativeInitializeAnimation();
 private:
 	
+	ATantrumnGameModeBase* GameModeRef;
 
 	void PlayerMoveVelocity();
 	

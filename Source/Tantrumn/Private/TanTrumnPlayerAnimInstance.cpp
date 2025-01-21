@@ -4,6 +4,7 @@
 #include "TanTrumnPlayerAnimInstance.h"
 #include "TanTrumnCharacterBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "TantrumnGameModeBase.h"
 UTanTrumnPlayerAnimInstance::UTanTrumnPlayerAnimInstance()
 	:bIsInAir(false)
 	,Crouch(false)
@@ -15,6 +16,15 @@ UTanTrumnPlayerAnimInstance::UTanTrumnPlayerAnimInstance()
 void UTanTrumnPlayerAnimInstance::NativeInitializeAnimation()
 {
 	Player = Cast<ATanTrumnCharacterBase>(TryGetPawnOwner());
+
+	if (UWorld* World = GetWorld())
+	{
+		GameModeRef = Cast<ATantrumnGameModeBase>(World->GetAuthGameMode());
+	}
+	else
+	{
+		GameModeRef = nullptr; // Explicitly set to nullptr for clarity
+	}
 }
 
 void UTanTrumnPlayerAnimInstance::PlayerMoveVelocity()
@@ -29,6 +39,29 @@ void UTanTrumnPlayerAnimInstance::PlayerMoveVelocity()
 		
 		Crouch = Player->bIsCrouched;
 
+		
+	}
+}
+void UTanTrumnPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+{
+	PlayerMoveVelocity();	
+	
+	if (GameModeRef)
+	{
+		EGameState CurrentGameAnimationState = GameModeRef->GetCurrentGameState();
+
+		if (CurrentGameAnimationState == EGameState::Waiting)
+		{
+			Hovering = true;
+		}
+		else if (CurrentGameAnimationState == EGameState::Playing)
+		{
+			Hovering = false;
+		}
+	}
+
+	if (Player)
+	{
 		if (!Player->IsPullingObject())
 		{
 			Interact =false;
@@ -37,9 +70,6 @@ void UTanTrumnPlayerAnimInstance::PlayerMoveVelocity()
 		{
 			Interact = true;
 		}
+			
 	}
-}
-void UTanTrumnPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
-{
-	PlayerMoveVelocity();	
 }
