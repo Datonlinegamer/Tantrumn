@@ -47,7 +47,4 @@ void ATantrumnGameModeBase::DisplayCountDown()
 void ATantrumnGameModeBase::StartGame()
 {
 	CurrentGameState = EGameState::Playing;
-	 FInputModeGameOnly InputMode;
-	PC->SetInputMode(InputMode);
-	PC->SetShowMouseCursor(false);
 }

@@ -9,7 +9,6 @@ UTanTrumnPlayerAnimInstance::UTanTrumnPlayerAnimInstance()
 	:bIsInAir(false)
 	,Crouch(false)
 	,Interact(false)
-	
 {
 
 
@@ -51,18 +50,15 @@ void UTanTrumnPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		EGameState CurrentGameAnimationState = GameModeRef->GetCurrentGameState();
 
-		if (CurrentGameAnimationState == EGameState::Waiting || CurrentGameAnimationState == EGameState::GameOver)
+		if (CurrentGameAnimationState == EGameState::Waiting)
 		{
 			Hovering = true;
-
 		}
 		else if (CurrentGameAnimationState == EGameState::Playing)
 		{
 			Hovering = false;
 		}
-
 	}
-
 
 	if (Player)
 	{

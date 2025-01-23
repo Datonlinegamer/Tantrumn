@@ -18,6 +18,8 @@ AThrowableActor::AThrowableActor()
 void AThrowableActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ToggleHighlight(false);
 	State = Estate::Idle;
 	Projectile->OnProjectileStop.AddDynamic(this, &AThrowableActor::ProjectileStop);
 	//StaticMeshComponent->SetEnableGravity(true);

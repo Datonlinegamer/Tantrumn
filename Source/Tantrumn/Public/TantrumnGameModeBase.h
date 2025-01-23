@@ -17,7 +17,7 @@ enum class EGameState : uint8
 /**
  * 
  */
-
+class UTantrumnGameWidget;
 UCLASS()
 class TANTRUMN_API ATantrumnGameModeBase : public AGameModeBase
 {
@@ -27,14 +27,14 @@ public:
 	ATantrumnGameModeBase();
 
 	virtual void BeginPlay() override;
-
-	EGameState GetCurrentGameState();
+	UFUNCTION(BlueprintCallable)
+	EGameState GetCurrentGameState()const ;
 
 	void PlayerReachedEnd();
 
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "States", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere,Category = "States")
 	EGameState CurrentGameState = EGameState::None;
 
 	UPROPERTY(EditAnywhere ,Category = "Game Details")
@@ -42,6 +42,13 @@ private:
 
 	FTimerHandle TimeHandle;
 
+	UPROPERTY()
+	UTantrumnGameWidget* GameWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameWidget")
+	TSubclassOf<UTantrumnGameWidget>GameWidgetClass;
+
+	APlayerController* PC;
 	void DisplayCountDown();
 	void StartGame();
 
