@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InteractInterface.h"
 #include "TanTrumnCharacterBase.generated.h"
 class UCameraComponent;
 class USpringArmComponent;
@@ -21,7 +22,7 @@ enum class ECharacterThrowState : uint8
 };
 
 UCLASS()
-class TANTRUMN_API ATanTrumnCharacterBase : public ACharacter
+class TANTRUMN_API ATanTrumnCharacterBase : public ACharacter,public IInteractInterface
 {
 	GENERATED_BODY()
 
