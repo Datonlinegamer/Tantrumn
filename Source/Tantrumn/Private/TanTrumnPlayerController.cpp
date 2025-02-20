@@ -140,21 +140,18 @@ void ATanTrumnPlayerController::PlayerStartSprinting(const FInputActionValue& Va
 
 void ATanTrumnPlayerController::Walking()
 {
-    if (PC && PC->GetCharacterMovement())
+    if (PC)
     {
-        PC->GetCharacterMovement()->MaxWalkSpeed = 500.0f;
-        PC->GetCharacterMovement()->BrakingDecelerationWalking = 100.0f;
-        PC->GetCharacterMovement()->GroundFriction = 2.0f;
+        PC->RequestSprintEnd();
     }
 }
 
 void ATanTrumnPlayerController::Sprinting()
 {
-    if (PC && PC->GetCharacterMovement())
+    if (PC)
     {
-        PC->GetCharacterMovement()->MaxWalkSpeed = 900.0f;
-        PC->GetCharacterMovement()->BrakingDecelerationWalking = 300.0f;
-        PC->GetCharacterMovement()->GroundFriction = 5.0f;
+        PC->RequestSprintStart();
+
     }
 }
 
@@ -184,6 +181,7 @@ void ATanTrumnPlayerController::RequestPullObjectStart(const FInputActionValue& 
     if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
     if (!PC->IsPullingObject())
     {
+
         PC->RequestPullObjectStart();
     }
     else
@@ -195,9 +193,19 @@ void ATanTrumnPlayerController::RequestPullObjectStart(const FInputActionValue& 
 
 void ATanTrumnPlayerController::PlayerThrowObject(const FInputActionValue& Value)
 {
+    float Axis = Value.Get<float>();
     if (PC->CanThrowObject())
     {
-        PC->PlayThrowMontage();
+        if (Axis >0)
+        {
+            PC->RequestThrowObject();
+            PC->PlayThrowMontage();
+        }
+        else
+        {
+            PC->RequestUsetObject();
+        }
+
     }
 }
 

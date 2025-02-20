@@ -25,6 +25,7 @@ public:
 	bool Sprint;
 	bool bInputAxis;
 	bool pull;
+	void Sprinting();
 protected:
 	float GroundCheckDistance = 100.0f;
 	void Move(const FInputActionValue& Value);
@@ -38,14 +39,12 @@ protected:
 	void RequestPullObjectStart(const FInputActionValue& Value);
 	void SetupInputComponent();
 	void Walking();
-	void Sprinting();
 	void StopJumping();
 	void ToggleCrouch();
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditDefaultsOnly)
-	float SprintSpeed;
+	
 
 
 	UPROPERTY(EditDefaultsOnly)

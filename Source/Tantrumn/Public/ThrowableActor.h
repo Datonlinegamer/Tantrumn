@@ -1,12 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+	// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "InteractInterface.h"
 #include "ThrowableActor.generated.h"
 class  UProjectileMovementComponent;
-
+class UInteractInterface;
 UCLASS()
 class TANTRUMN_API AThrowableActor : public AActor
 {
@@ -30,6 +31,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsIdle() const { return State == Estate::Idle; }
+
+	EEffectType GetEffectType();
 protected:
 	enum class Estate
 	{
@@ -44,7 +47,7 @@ protected:
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit);
 	
 	virtual void BeginPlay() override;
-	
+
 	
 	UFUNCTION(BlueprintCallable)
 	bool SetHomingTarget(AActor* Target);
@@ -68,6 +71,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	AActor* PullActor = nullptr;
+	
+	UPROPERTY(EditAnywhere)
+	EEffectType EffectType = EEffectType::None;
 public:	
 	
 	virtual void Tick(float DeltaTime) override;

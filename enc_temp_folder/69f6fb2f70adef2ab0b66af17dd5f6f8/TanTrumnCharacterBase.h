@@ -21,24 +21,7 @@ enum class ECharacterThrowState : uint8
 	Throwing		UMETA(DisplayName = "Throwing"),
 };
 
-
-USTRUCT(BlueprintType)
-struct FEffectStats : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	EEffectType EffectType; // Fixed enum reference
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float EffectStrength = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FString EffectDescription = "";
-};
-
 UCLASS()
-
 class TANTRUMN_API ATanTrumnCharacterBase : public ACharacter,public IInteractInterface
 {
 	GENERATED_BODY()
@@ -57,9 +40,6 @@ public:
 	void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 	void ResetThrowableObject();
 	bool CanThrowObject() const { return CharacterThrowState == ECharacterThrowState::Attached; }
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
-	class UDataTable* EffectTable;
 
 	void RequestThrowObject();
 	void RequestPullObjectStart();
@@ -91,20 +71,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Throw", meta = (ClampMin = "0.0", Unit = "ms"))
 	float ThrowSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
-	EEffectType SelectedEffectBP = EEffectType::None; // Fixed enum reference
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
-	EEffectType EffectTypes = EEffectType::None; // Fixed enum reference
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
-	FName SelectedEffect = " ";
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
-	float EffectStrength = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
-	FString Description = " ";
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

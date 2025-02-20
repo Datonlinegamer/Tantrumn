@@ -55,7 +55,6 @@ ATanTrumnCharacterBase::ATanTrumnCharacterBase()
 void ATanTrumnCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
 	EffectCoolDown = DefaultEffectCoolDown;
 	cameraSpringArm->bEnableCameraLag = true;
 	cameraSpringArm->bEnableCameraRotationLag = true;
@@ -470,19 +469,6 @@ void ATanTrumnCharacterBase::ApplyEffect_Implementation(EEffectType EffectType, 
 		}
 		break;
 	case EEffectType::Jump:
-
-		if (EffectTable)
-		{
-			static const FString ContextString(TEXT("Effect Context"));
-			FEffectStats* Stats = EffectTable->FindRow<FEffectStats>(FName(SelectedEffect), ContextString, true);
-
-			if (Stats)
-			{
-				EffectTypes = Stats->EffectType;
-				EffectStrength = Stats->EffectStrength;
-				Description = Stats->EffectDescription;
-			}
-		}
 		break;
 	case EEffectType::Power:
 		break;

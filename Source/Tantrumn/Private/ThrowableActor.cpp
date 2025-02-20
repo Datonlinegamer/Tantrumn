@@ -4,6 +4,7 @@
 #include "ThrowableActor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "TanTrumnCharacterBase.h"
+#include "InteractInterface.h"
 // Sets default values
 AThrowableActor::AThrowableActor()
 {
@@ -39,6 +40,16 @@ void AThrowableActor::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 	if (State == Estate::Idle || State == Estate::Attached || State == Estate::Dropped)
 	{
 		return;
+	}
+
+	if (State ==Estate::Launch)
+	{
+		IInteractInterface* I = Cast<IInteractInterface>(Other);
+		if (I)
+		{
+			I->Execute_ApplyEffect(Other, EffectType, false);
+
+		}
 	}
 	if (PullActor && State == Estate::Pull)
 	{
@@ -146,6 +157,11 @@ void AThrowableActor::Drop()
 	Projectile->Activate(true);
 	Projectile->HomingTargetComponent = nullptr;
 	State = Estate::Dropped;
+}
+
+EEffectType AThrowableActor::GetEffectType()
+{
+	return EffectType;
 }
 
 void AThrowableActor::ToggleHighlight(bool bIsOn)
