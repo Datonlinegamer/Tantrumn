@@ -43,9 +43,15 @@ protected:
 	void ToggleCrouch();
 	virtual void BeginPlay() override;
 
+	virtual	void ReceivedPlayer() override;
+
 private:
 	
+	UPROPERTY(EditAnywhere, Category = "HUD")
+	TSubclassOf<class UUserWidget> HUDClass;
 
+	UPROPERTY()
+	UUserWidget* HUDWidget;
 
 	UPROPERTY(EditDefaultsOnly)
 	UTanTrumCharacterMovementComp* moveComp;

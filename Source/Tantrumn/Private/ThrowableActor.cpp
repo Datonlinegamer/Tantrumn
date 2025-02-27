@@ -13,6 +13,7 @@ AThrowableActor::AThrowableActor()
 	StaticMeshComponent = CreateDefaultSubobject <UStaticMeshComponent>("StaticMesh");
 	Projectile = CreateDefaultSubobject<UProjectileMovementComponent>("Projectile");
 	RootComponent = StaticMeshComponent;
+	SetReplicateMovement(true);
 }
 
 // Called when the game starts or when spawned

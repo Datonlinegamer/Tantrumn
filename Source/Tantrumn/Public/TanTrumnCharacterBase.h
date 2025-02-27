@@ -50,11 +50,14 @@ public:
 	bool PlayThrowMontage();
 	ATanTrumnCharacterBase();
 	bool bIsStunned;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 	void BaseCharacterCrouch();
 	void BaseCharacterUnCrouch();
 	void OnThrowableAttached(AThrowableActor* InThrowableActor);
 	virtual void Landed(const FHitResult& Hit)override;
+	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+
 	void ResetThrowableObject();
 	bool CanThrowObject() const { return CharacterThrowState == ECharacterThrowState::Attached; }
 
@@ -68,10 +71,34 @@ public:
 	void RequestUsetObject();
 	UFUNCTION()
 	void OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION(Server,Reliable)
+	void ServerRequestThrowObject();
 
+
+
+	
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRequestThrowObject();
 	UFUNCTION(BlueprintPure)
 	bool IsPullingObject() const { return CharacterThrowState == ECharacterThrowState::RequestingPull || CharacterThrowState == ECharacterThrowState::Pulling; }
+	
+	UFUNCTION(Server, Reliable)
+	void ServerPullObject(AThrowableActor* InThrowableActor);
 
+	UFUNCTION(Server, Reliable)
+	void ServerRequestPullObject(bool bIsPulling);
+
+	
+
+	UFUNCTION(Client, Reliable)
+	void ClientThrowableAttached(AThrowableActor* InThrowableActor);
+
+	UFUNCTION(Server, Reliable)
+	void ServerBeginThrow();
+
+	UFUNCTION(Server, Reliable)
+	void ServerFinishThrow();
 	//UFUNCTION()
 	//void OnNotifyBeginRecieved(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 	UFUNCTION()
@@ -80,6 +107,7 @@ public:
 	void UpdateStun();
 
 	void OnStunEnd();
+	void OnRep_CharacterThrowState(const ECharacterThrowState& OldCharacterThrowState);
 	float StunTime = 0.0f;
 	float StunBeginTimestamp = 0.0f;
 
@@ -132,8 +160,9 @@ private:
 
 	UPROPERTY()
 	AThrowableActor* ThrowableActor;
+													// not working
+	//UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_CharacterThrowState, Category = "Throw")
 
-	UPROPERTY(VisibleAnywhere, Category = "Throw")
 	ECharacterThrowState CharacterThrowState = ECharacterThrowState::None;
 
 	FOnMontageBlendingOutStarted BlendingOutDelegate;

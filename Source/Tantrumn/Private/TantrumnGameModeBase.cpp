@@ -12,13 +12,35 @@ ATantrumnGameModeBase::ATantrumnGameModeBase()
 	DefaultPawnClass = ATanTrumnCharacterBase::StaticClass();
 
 }
-
 void ATantrumnGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	DisplayCountDown();
+	DisplayCountdown();
 	GetWorld()->GetTimerManager().SetTimer(TimeHandle, this, &ATantrumnGameModeBase::StartGame, GameCountDownDuration, false);
 	CurrentGameState = EGameState::Waiting;
+}
+
+void ATantrumnGameModeBase::ReceivePlayer(APlayerController* PlayerController)
+{
+	AttemptStartGame();
+}
+
+
+void ATantrumnGameModeBase::AttemptStartGame()
+{
+	if (GetNumPlayers() == NumExpectedPlayers)
+	{
+		DisplayCountdown();
+		if (GameCountDownDuration > SMALL_NUMBER)
+		{
+			GetWorld()->GetTimerManager().SetTimer(TimeHandle, this, &ATantrumnGameModeBase::StartGame, GameCountDownDuration, false);
+		}
+		else
+		{
+			StartGame();
+		}
+
+	}
 }
 
 EGameState ATantrumnGameModeBase::GetCurrentGameState()const
@@ -35,19 +57,34 @@ void ATantrumnGameModeBase::PlayerReachedEnd()
 	PC->SetShowMouseCursor(true);
 }
 
-void ATantrumnGameModeBase::DisplayCountDown()
+void ATantrumnGameModeBase::DisplayCountdown()
 {
-	if (!GameWidgetClass) { return; }
-	PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	GameWidget = CreateWidget<UTantrumnGameWidget>(PC, GameWidgetClass);
-	GameWidget->AddToViewport();
-	GameWidget->StartCountDown(GameCountDownDuration, this);
+	if (!GameWidgetClass)
+	{
+		return;
+	}
+
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* PlayerController = Iterator->Get();
+		if (PlayerController && PlayerController->PlayerState && !MustSpectate(PlayerController))
+		{
+			if (UTantrumnGameWidget* Widget = CreateWidget<UTantrumnGameWidget>(PlayerController, GameWidgetClass))
+			{
+				//GameWidget->AddToViewport();
+				Widget->AddToPlayerScreen();
+				Widget->StartCountDown(GameCountDownDuration, this);
+				GameWidgets.Add(PlayerController, Widget);
+			}
+		}
+	}
 }
 
 void ATantrumnGameModeBase::StartGame()
 {
 	CurrentGameState = EGameState::Playing;
-	 FInputModeGameOnly InputMode;
+	FInputModeGameOnly InputMode;
+	if (!PC)return;
 	PC->SetInputMode(InputMode);
 	PC->SetShowMouseCursor(false);
 }

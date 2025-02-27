@@ -13,6 +13,7 @@
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "TantrumnGameModeBase.h"
+#include "Blueprint/UserWidget.h"
 
 ATanTrumnPlayerController::ATanTrumnPlayerController(const FObjectInitializer& obj)
     : Super(obj), Sprint(false)
@@ -51,7 +52,25 @@ void ATanTrumnPlayerController::BeginPlay()
         }
     }
 }
+void ATanTrumnPlayerController::ReceivedPlayer()
+{
+    Super::ReceivedPlayer();
+    GameModeRef = GetWorld()->GetAuthGameMode<ATantrumnGameModeBase>();
+    if (ensureMsgf(GameModeRef, TEXT("ATantrumnPlayerController::ReceivedPlayer missing GameMode Reference")))
+    {
+        GameModeRef->ReceivePlayer(this);
+    }
 
+    if (HUDClass)
+    {
+        HUDWidget = CreateWidget(this, HUDClass);
+        if (HUDWidget)
+        {
+            //HUDWidget->AddToViewport();
+            HUDWidget->AddToPlayerScreen();
+        }
+    }
+}
 void ATanTrumnPlayerController::Move(const FInputActionValue& Value)
 {
     if (!PC) return;
@@ -125,7 +144,7 @@ void ATanTrumnPlayerController::PlayerStartSprinting(const FInputActionValue& Va
     if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
     if (PC)
     {
-          if (Sprint)
+        if (Sprint)
         {
             Sprinting();
         }
@@ -199,7 +218,7 @@ void ATanTrumnPlayerController::PlayerThrowObject(const FInputActionValue& Value
         if (Axis >0)
         {
             PC->RequestThrowObject();
-            PC->PlayThrowMontage();
+          
         }
         else
         {

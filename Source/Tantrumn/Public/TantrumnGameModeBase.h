@@ -26,6 +26,10 @@ public:
 
 	ATantrumnGameModeBase();
 
+	void ReceivePlayer(APlayerController* PlayerController);
+
+	void AttemptStartGame();
+
 	virtual void BeginPlay() override;
 	UFUNCTION(BlueprintCallable)
 	EGameState GetCurrentGameState()const ;
@@ -47,9 +51,16 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GameWidget")
 	TSubclassOf<UTantrumnGameWidget>GameWidgetClass;
-
+	UPROPERTY()
+	TMap<APlayerController*, UTantrumnGameWidget*> GameWidgets;
 	APlayerController* PC;
-	void DisplayCountDown();
+	void DisplayCountdown();
+	UFUNCTION(BlueprintCallable, Category = "Game Details")
+	void SetNumExpectedPlayers(uint8 InNumExpectedPlayers) { NumExpectedPlayers = InNumExpectedPlayers; }
+
+	UPROPERTY(EditAnywhere, Category = "Game Details")
+	uint8 NumExpectedPlayers = 1u;
+	
 	void StartGame();
 
 };

@@ -10,6 +10,8 @@
 #include "DrawDebugHelpers.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
+
 
 constexpr int CVSphereCastPlayerView = 0;
 constexpr int CVSphereCastActorTransform = 1;
@@ -49,27 +51,39 @@ ATanTrumnCharacterBase::ATanTrumnCharacterBase()
 	cameraSpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	cameraSpringArm->SetupAttachment(GetMesh());
 	Camera->SetupAttachment(cameraSpringArm);
+	bReplicates = true;
 }
 
 
 void ATanTrumnCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
 	EffectCoolDown = DefaultEffectCoolDown;
 	cameraSpringArm->bEnableCameraLag = true;
 	cameraSpringArm->bEnableCameraRotationLag = true;
 	cameraSpringArm->CameraRotationLagSpeed = 10;
 	cameraSpringArm->CameraLagSpeed = 10;
 	PController = GetController<ATanTrumnPlayerController>();
-	APlayerCameraManager* CameraManager = PController->PlayerCameraManager;
+	/*APlayerCameraManager* CameraManager = PController->PlayerCameraManager;
 	if (CameraManager)
 	{
 		CameraManager->ViewPitchMax = 0.0f;
 		CameraManager->ViewPitchMin = -32.0f;
-	}
+	}*/
 }
 
+void ATanTrumnCharacterBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams SharedParams;
+	SharedParams.bIsPushBased = true;
+	SharedParams.Condition = COND_SkipOwner;
+	//not working
+	//DOREPLIFETIME_WITH_PARAMS_FAST(ATanTrumnCharacterBase, CharacterThrowState, SharedParams);
+
+
+}
 void ATanTrumnCharacterBase::BaseCharacterCrouch()
 {
 	Crouch();
@@ -104,6 +118,7 @@ void ATanTrumnCharacterBase::RequestThrowObject()
 			if (PlayThrowMontage())
 			{
 				CharacterThrowState = ECharacterThrowState::Throwing;
+				ServerRequestThrowObject();
 			}
 			else
 			{
@@ -165,30 +180,33 @@ void ATanTrumnCharacterBase::UnbindMontage()
 bool ATanTrumnCharacterBase::PlayThrowMontage()
 {
 	const float PlayRate = 1.0f;
-	bool bPlayedSuccessfully = PlayAnimMontage(ThrowMontage, PlayRate) > 0.0f;
+	bool bPlayedSuccessfully = PlayAnimMontage(ThrowMontage, PlayRate) > 0.f;
 	if (bPlayedSuccessfully)
 	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-		if (!BlendingOutDelegate.IsBound())
+		if (IsLocallyControlled())
 		{
-			BlendingOutDelegate.BindUObject(this, &ATanTrumnCharacterBase::OnMontageBlendingOut);
-		}
-		AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, ThrowMontage);
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-		if (!MontageEndedDelegate.IsBound())
-		{
-			MontageEndedDelegate.BindUObject(this, &ATanTrumnCharacterBase::OnMontageEnded);
-		}
-		AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, ThrowMontage);
+			if (!BlendingOutDelegate.IsBound())
+			{
+				BlendingOutDelegate.BindUObject(this, &ATanTrumnCharacterBase::OnMontageBlendingOut);
+			}
+			AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, ThrowMontage);
 
-		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &ATanTrumnCharacterBase::OnNotifyBeginReceived);
-		AnimInstance->OnPlayMontageNotifyEnd.AddDynamic(this, &ATanTrumnCharacterBase::OnNotifyEndRecieved);
+			if (!MontageEndedDelegate.IsBound())
+			{
+				MontageEndedDelegate.BindUObject(this, &ATanTrumnCharacterBase::OnMontageEnded);
+			}
+			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, ThrowMontage);
+
+			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &ATanTrumnCharacterBase::OnNotifyBeginReceived);
+			AnimInstance->OnPlayMontageNotifyEnd.AddDynamic(this, &ATanTrumnCharacterBase::OnNotifyEndRecieved);
+		}
 	}
 
 	return bPlayedSuccessfully;
 }
-
+													
 
 void ATanTrumnCharacterBase::RequestPullObjectStart()
 {
@@ -199,8 +217,7 @@ void ATanTrumnCharacterBase::RequestPullObjectStart()
 }
 void ATanTrumnCharacterBase::ProcessTraceResult(const FHitResult& HitResult)
 {
-	// Check if there was an existing throwable actor
-	// Remove the highlight to avoid wrong feedback
+	
 	AThrowableActor* HitThrowableActor = HitResult.bBlockingHit ? Cast<AThrowableActor>(HitResult.GetActor()) : nullptr;
 	const bool IsSameActor = (ThrowableActor == HitThrowableActor);
 	const bool IsValidTarget = HitThrowableActor && HitThrowableActor->IsIdle();
@@ -256,6 +273,81 @@ void ATanTrumnCharacterBase::RequestUsetObject()
 void ATanTrumnCharacterBase::OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted)
 {
 }
+void ATanTrumnCharacterBase::ServerRequestThrowObject_Implementation()
+{
+	MultiCastRequestThrowObject();
+}
+void ATanTrumnCharacterBase::MultiCastRequestThrowObject_Implementation()
+{
+	if (IsLocallyControlled())
+	{
+		return;
+	}
+
+	PlayThrowMontage();
+	CharacterThrowState = ECharacterThrowState::Throwing;
+}
+
+void ATanTrumnCharacterBase::ServerFinishThrow_Implementation()
+{
+	
+	CharacterThrowState = ECharacterThrowState::None;
+
+	MoveIgnoreActorRemove(ThrowableActor);
+	if (ThrowableActor->GetRootComponent())
+	{
+		UPrimitiveComponent* RootPrimitiveComponent = Cast<UPrimitiveComponent>(ThrowableActor->GetRootComponent());
+		if (RootPrimitiveComponent)
+		{
+			RootPrimitiveComponent->IgnoreActorWhenMoving(this, false);
+		}
+	}
+	ThrowableActor = nullptr;
+}
+void ATanTrumnCharacterBase::ServerRequestPullObject_Implementation(bool bIsPulling)
+{
+	CharacterThrowState = bIsPulling ? ECharacterThrowState::RequestingPull : ECharacterThrowState::None;
+}
+
+void ATanTrumnCharacterBase::ServerPullObject_Implementation(AThrowableActor* InThrowableActor)
+{
+	if (InThrowableActor && InThrowableActor->Pull(this))
+	{
+		CharacterThrowState = ECharacterThrowState::Pulling;
+		ThrowableActor = InThrowableActor;
+		ThrowableActor->ToggleHighlight(false);
+	}
+}
+
+void ATanTrumnCharacterBase::ClientThrowableAttached_Implementation(AThrowableActor* InThrowableActor)
+{
+	CharacterThrowState = ECharacterThrowState::Attached;
+	ThrowableActor = InThrowableActor;
+	MoveIgnoreActorAdd(ThrowableActor);
+}
+
+void ATanTrumnCharacterBase::ServerBeginThrow_Implementation()
+{
+	if (ThrowableActor->GetRootComponent())
+	{
+		UPrimitiveComponent* RootPrimitiveComponent = Cast<UPrimitiveComponent>(ThrowableActor->GetRootComponent());
+		if (RootPrimitiveComponent)
+		{
+			RootPrimitiveComponent->IgnoreActorWhenMoving(this, true);
+		}
+	}
+	
+	const FVector& Direction = GetActorForwardVector() * ThrowSpeed;
+	ThrowableActor->Launch(Direction);
+
+	if (CVarDisplayThrowVelocity->GetBool())
+	{
+		const FVector& Start = GetMesh()->GetSocketLocation(TEXT("ObjectAttach"));
+		DrawDebugLine(GetWorld(), Start, Start + Direction, FColor::Red, false, 5.0f);
+	}
+}
+
+
 void ATanTrumnCharacterBase::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
@@ -323,6 +415,14 @@ void  ATanTrumnCharacterBase::OnStunEnd()
 	StunTime = 0.0f;
 }
 	
+void ATanTrumnCharacterBase::OnRep_CharacterThrowState(const ECharacterThrowState& OldCharacterThrowState)
+{
+	if (CharacterThrowState != OldCharacterThrowState)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OldThrowState: %s"), *UEnum::GetDisplayValueAsText(OldCharacterThrowState).ToString());
+		UE_LOG(LogTemp, Warning, TEXT("CharacterThrowState: %s"), *UEnum::GetDisplayValueAsText(CharacterThrowState).ToString());
+	}
+}
 
 void  ATanTrumnCharacterBase::SphereCastPlayerView()
 {
@@ -396,6 +496,10 @@ void  ATanTrumnCharacterBase::LineCastActorTransform()
 void ATanTrumnCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (!IsLocallyControlled())
+	{
+		return;
+	}
 	UpdateStun();
 	if (bIsStunned)
 	{
@@ -417,14 +521,14 @@ void ATanTrumnCharacterBase::Tick(float DeltaTime)
 
 	if (CharacterThrowState == ECharacterThrowState::Throwing)
 	{
-		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+		/*if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 		{
 			if (UAnimMontage* CurrentAnimMontage = AnimInstance->GetCurrentActiveMontage())
 			{
 				const float PlayRate = AnimInstance->GetCurveValue(TEXT("ThrowCurve"));
 				AnimInstance->Montage_SetPlayRate(CurrentAnimMontage, PlayRate);
 			}
-		}
+		}*/
 	}
 
 
