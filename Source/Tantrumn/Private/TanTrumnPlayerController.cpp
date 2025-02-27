@@ -25,8 +25,10 @@ ATanTrumnPlayerController::ATanTrumnPlayerController(const FObjectInitializer& o
 void ATanTrumnPlayerController::BeginPlay()
 {
     Super::BeginPlay();
+    APawn* p = GetPawn();
+    ACharacter* c = GetCharacter();
 
-    PC = Cast<ATanTrumnCharacterBase>(GetPawn());
+    PC= Cast<ATanTrumnCharacterBase>(GetCharacter());
     GameModeRef = Cast<ATantrumnGameModeBase>(GetWorld()->GetAuthGameMode());
    
     if (PC)
@@ -73,6 +75,10 @@ void ATanTrumnPlayerController::ReceivedPlayer()
 }
 void ATanTrumnPlayerController::Move(const FInputActionValue& Value)
 {
+    APawn* p = GetPawn();
+    ACharacter* c = GetCharacter();
+
+    PC = Cast<ATanTrumnCharacterBase>(GetCharacter());
     if (!PC) return;
     if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
 
@@ -213,7 +219,7 @@ void ATanTrumnPlayerController::RequestPullObjectStart(const FInputActionValue& 
 void ATanTrumnPlayerController::PlayerThrowObject(const FInputActionValue& Value)
 {
     float Axis = Value.Get<float>();
-    if (PC->CanThrowObject())
+    if (PC && PC->CanThrowObject())
     {
         if (Axis >0)
         {
