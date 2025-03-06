@@ -14,7 +14,7 @@ class ATanTrumnCharacterBase;
 struct  FInputActionValue;
 class ATanTrumnCharacterBase;
 class UTanTrumCharacterMovementComp;
-//class UTanTrumnCharacterMovementComp;
+
 UCLASS()
 class TANTRUMN_API ATanTrumnPlayerController : public APlayerController
 {
@@ -26,6 +26,7 @@ public:
 	bool bInputAxis;
 	bool pull;
 	void Sprinting();
+	void ClientReachedEnd_Implementation();
 protected:
 	float GroundCheckDistance = 100.0f;
 	void Move(const FInputActionValue& Value);
@@ -43,6 +44,8 @@ protected:
 	void ToggleCrouch();
 	virtual void BeginPlay() override;
 
+	void OnPossess(APawn* aPawn);
+
 	virtual	void ReceivedPlayer() override;
 
 private:
@@ -53,8 +56,8 @@ private:
 	UPROPERTY()
 	UUserWidget* HUDWidget;
 
-	UPROPERTY(EditDefaultsOnly)
-	UTanTrumCharacterMovementComp* moveComp;
+	
+
 	UPROPERTY(EditDefaultsOnly)
 	ATanTrumnCharacterBase* PC;
 	float JumpCooldownTime = 1.9f; // Cooldown duration in seconds

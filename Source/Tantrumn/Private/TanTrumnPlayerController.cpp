@@ -8,7 +8,7 @@
 #include "TanTrumnCharacterBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "TanTrumCharacterMovementComp.h"
+
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -18,8 +18,8 @@
 ATanTrumnPlayerController::ATanTrumnPlayerController(const FObjectInitializer& obj)
     : Super(obj), Sprint(false)
 {
-    // Ensure the movement component is initialized
-    moveComp = CreateDefaultSubobject<UTanTrumCharacterMovementComp>(TEXT("MoveComp"));
+   
+ 
 }
 
 void ATanTrumnPlayerController::BeginPlay()
@@ -30,11 +30,11 @@ void ATanTrumnPlayerController::BeginPlay()
 
     PC= Cast<ATanTrumnCharacterBase>(GetCharacter());
     GameModeRef = Cast<ATantrumnGameModeBase>(GetWorld()->GetAuthGameMode());
-   
     if (PC)
     {
         Walking();
        
+        PC->AutoPossessPlayer = EAutoReceiveInput::Type::Player0;
 
         // Disable controller rotation and enable movement orientation
         PC->bUseControllerRotationPitch = false;
@@ -54,6 +54,12 @@ void ATanTrumnPlayerController::BeginPlay()
         }
     }
 }
+void ATanTrumnPlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+	UE_LOG(LogTemp, Warning, TEXT("OnPossess: %s"), *GetName());
+}
+
 void ATanTrumnPlayerController::ReceivedPlayer()
 {
     Super::ReceivedPlayer();
@@ -142,7 +148,19 @@ void ATanTrumnPlayerController::PlayerJump(const FInputActionValue& Value)
         LastJumpTime = CurrentTime; // Update the last jump time
     }
 }
+void ATanTrumnPlayerController::ClientReachedEnd_Implementation()
+{
+    if (ATanTrumnCharacterBase* TantrumnCharacterBase = Cast<ATanTrumnCharacterBase>(GetCharacter()))
+    {
+       // TantrumnCharacterBase->ServerPlayCelebrateMontage();
+        TantrumnCharacterBase->GetCharacterMovement()->DisableMovement();
+    }
 
+   /* if (UTantrumnGameInstance* TantrumnGameInstance = GetWorld()->GetGameInstance<UTantrumnGameInstance>())
+    {
+      
+    }*/
+}
 
 void ATanTrumnPlayerController::PlayerStartSprinting(const FInputActionValue& Value)
 {
@@ -191,7 +209,8 @@ void ATanTrumnPlayerController::StopJumping()
 
 void ATanTrumnPlayerController::ToggleCrouch()
 {
-    if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
+    if (!PC&&!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing){ return; }
+        
     if (PC->bIsCrouched)
     {
         PC->BaseCharacterUnCrouch();

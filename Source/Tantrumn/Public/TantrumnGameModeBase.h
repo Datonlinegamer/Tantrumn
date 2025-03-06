@@ -17,6 +17,8 @@ enum class EGameState : uint8
 /**
  * 
  */
+class ATanTrumnCharacterBase;
+
 class UTantrumnGameWidget;
 UCLASS()
 class TANTRUMN_API ATantrumnGameModeBase : public AGameModeBase
@@ -34,7 +36,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EGameState GetCurrentGameState()const ;
 
-	void PlayerReachedEnd();
+	void PlayerReachedEnd(ATanTrumnCharacterBase* TantrumnCharacter);
+
+	
 
 
 private:

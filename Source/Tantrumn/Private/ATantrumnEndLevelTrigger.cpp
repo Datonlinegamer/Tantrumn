@@ -17,8 +17,12 @@ void AATantrumnEndLevelTrigger::BeginPlay()
 
 void AATantrumnEndLevelTrigger::OnOverLapBegin(AActor* OverLapActor, AActor* OtherActer)
 {
-	if (OtherActer == Cast<ATanTrumnCharacterBase>(OtherActer))
+	if (HasAuthority())
 	{
-		GameModeRef->PlayerReachedEnd();
+		if (OtherActer == Cast<ATanTrumnCharacterBase>(OtherActer))
+		{
+			//GameModeRef->PlayerReachedEnd();
+		}
+
 	}
 }

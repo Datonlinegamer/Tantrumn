@@ -5,6 +5,8 @@
 #include "TanTrumnCharacterBase.h"
 #include "TantrumnGameWidget.h"
 #include <Kismet/GameplayStatics.h>
+#include "TanTrumnPlayerController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 ATantrumnGameModeBase::ATantrumnGameModeBase()
 	:GameCountDownDuration(4.0f)
 	,PC(nullptr)
@@ -48,13 +50,35 @@ EGameState ATantrumnGameModeBase::GetCurrentGameState()const
 	return CurrentGameState;
 }
 
-void ATantrumnGameModeBase::PlayerReachedEnd()
+void  ATantrumnGameModeBase::PlayerReachedEnd(ATanTrumnCharacterBase* TantrumnCharacter)
 {
-	CurrentGameState = EGameState::GameOver;
-	GameWidget->LevelComplete();
-	FInputModeUIOnly InputMode;
-	PC->SetInputMode(InputMode);
-	PC->SetShowMouseCursor(true);
+	ensureMsgf(HasAuthority(), TEXT("ATantrumnGameStateBase::OnPlayerReachedEnd being called from Non Authority!"));
+	if (ATanTrumnPlayerController* TantrumnPlayerController = TantrumnCharacter->GetController<ATanTrumnPlayerController>())
+	{
+
+			
+		TantrumnCharacter->GetCharacterMovement()->DisableMovement();
+
+		//ATantrumnPlayerState* PlayerState = TantrumnPlayerController->GetPlayerState<ATantrumnPlayerState>();
+		//if (PlayerState)
+		//{
+		//	const bool IsWinner = Results.Num() == 0;
+		//	PlayerState->SetIsWinner(IsWinner);
+		//	PlayerState->SetCurrentState(EPlayerGameState::Finished);
+		//}
+
+		//FGameResult Result;
+		//Result.Name = TantrumnCharacter->GetName();
+		////TODO get the actual time it took in order to post to a leaderboard/results widget
+		//Result.Time = 5.0f;
+		//Results.Add(Result);
+
+		////TODO this will not work once JIP(Join In Progress) is enabled
+		//if (Results.Num() == PlayerArray.Num())
+		//{
+		//	GameState = EGameState::GameOver;
+		//}
+	}
 }
 
 void ATantrumnGameModeBase::DisplayCountdown()

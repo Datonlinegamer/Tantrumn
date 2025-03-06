@@ -50,6 +50,7 @@ public:
 	bool PlayThrowMontage();
 	ATanTrumnCharacterBase();
 	bool bIsStunned;
+	bool PlayCelebrateMontage();
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 	void BaseCharacterCrouch();
 	void BaseCharacterUnCrouch();
@@ -63,7 +64,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
 	class UDataTable* EffectTable;
-
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* CelebrateMontage = nullptr;
 	void RequestThrowObject();
 	void RequestPullObjectStart();
 	void ProcessTraceResult(const FHitResult& HitResult);
@@ -73,8 +75,7 @@ public:
 	void OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted);
 	UFUNCTION(Server,Reliable)
 	void ServerRequestThrowObject();
-
-
+	
 
 	
 

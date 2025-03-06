@@ -11,6 +11,7 @@
 #include <Kismet/KismetSystemLibrary.h>
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "TanTrumnCharacterBase.h"
 
 
 constexpr int CVSphereCastPlayerView = 0;
@@ -72,6 +73,23 @@ void ATanTrumnCharacterBase::BeginPlay()
 	}*/
 }
 
+bool ATanTrumnCharacterBase::PlayCelebrateMontage()
+{	
+	const float PlayRate = 1.0f;
+	bool bPlayedSuccessfully = PlayAnimMontage(CelebrateMontage, PlayRate) > 0.f;
+	if (bPlayedSuccessfully)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		if (!MontageEndedDelegate.IsBound())
+		{
+			MontageEndedDelegate.BindUObject(this, &ATanTrumnCharacterBase::OnMontageEnded);
+		}
+		AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, CelebrateMontage);
+	}
+
+	return bPlayedSuccessfully;
+}
 void ATanTrumnCharacterBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -130,9 +148,39 @@ void ATanTrumnCharacterBase::RequestThrowObject()
 
 void ATanTrumnCharacterBase::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	UnbindMontage();
+	if (IsLocallyControlled())
+	{
+		UnbindMontage();
+
+	}
+
+	if (Montage == ThrowMontage)
+	{
+		if (IsLocallyControlled())
+		{
+			CharacterThrowState = ECharacterThrowState::None;
+			ServerFinishThrow();
+			ThrowableActor;
+		}
+	}
+	else
+	{
+		if (Montage == CelebrateMontage)
+		{
+			if (IsLocallyControlled())
+			{
+				/*if ()
+				{
+
+				}*/
+			}
+		}
+	}
 	CharacterThrowState = ECharacterThrowState::None;
 	MoveIgnoreActorRemove(ThrowableActor);
+
+
+
 	if (ThrowableActor)
 	{
 
