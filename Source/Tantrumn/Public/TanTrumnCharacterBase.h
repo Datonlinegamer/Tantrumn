@@ -76,8 +76,11 @@ public:
 	UFUNCTION(Server,Reliable)
 	void ServerRequestThrowObject();
 	
+	UFUNCTION(Server,Reliable)
+	void ServerPlayCelebrateMontage();
 
-	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayCelebrateMontage();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRequestThrowObject();

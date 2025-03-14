@@ -321,6 +321,14 @@ void ATanTrumnCharacterBase::RequestUsetObject()
 void ATanTrumnCharacterBase::OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted)
 {
 }
+void ATanTrumnCharacterBase::ServerPlayCelebrateMontage_Implementation()
+{
+	MulticastPlayCelebrateMontage();
+}
+void ATanTrumnCharacterBase::MulticastPlayCelebrateMontage_Implementation()
+{
+	PlayCelebrateMontage();
+}
 void ATanTrumnCharacterBase::ServerRequestThrowObject_Implementation()
 {
 	MultiCastRequestThrowObject();
