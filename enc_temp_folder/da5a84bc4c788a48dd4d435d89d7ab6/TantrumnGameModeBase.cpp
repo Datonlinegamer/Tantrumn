@@ -108,11 +108,7 @@ void ATantrumnGameModeBase::DisplayCountdown()
 
 void ATantrumnGameModeBase::StartGame()
 {
-	CurrentGameState = EGameState::Playing;
-	FInputModeGameOnly Input;
-	if (!PC)return;
-	PC->SetInputMode(Input);
-	PC->SetShowMouseCursor(false);
+
 	if (ATantrumnGameStateBase* TantrumnGameState = GetGameState<ATantrumnGameStateBase>())
 	{
 	TantrumnGameState->SetGameState(ETantrumnGameState::Playing);

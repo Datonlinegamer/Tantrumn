@@ -39,6 +39,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	ETantrumnGameState GetGameState() const { return GameState; }
+	UFUNCTION(BlueprintCallable)
+	ETantrumnGameState GetCurrentGameState();
 
 	UFUNCTION(BlueprintPure)
 	bool IsPlaying() const { return GameState == ETantrumnGameState::Playing; }

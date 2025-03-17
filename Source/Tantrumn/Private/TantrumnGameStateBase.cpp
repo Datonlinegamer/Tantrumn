@@ -9,6 +9,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "TantrumnPlayerState.h"
 
+ETantrumnGameState ATantrumnGameStateBase::GetCurrentGameState()
+{
+	return GameState;
+}
+
 void ATantrumnGameStateBase::OnPlayerReachedEnd(ATanTrumnCharacterBase* TantrumnCharacter)
 {
 	ensureMsgf(HasAuthority(), TEXT("ATantrumnGameStateBase::OnPlayerReachedEnd being called from Non Authority!"));

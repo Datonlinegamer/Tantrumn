@@ -263,7 +263,7 @@ void ATanTrumnCharacterBase::RequestPullObjectStart()
 		CharacterThrowState = ECharacterThrowState::RequestingPull;
 	}
 }
-void ATanTrumnCharacterBase::ProcessTraceResult(const FHitResult& HitResult)
+void ATanTrumnCharacterBase::ProcessTraceResult(const FHitResult& HitResult,bool bHighLighting)
 {
 	
 	AThrowableActor* HitThrowableActor = HitResult.bBlockingHit ? Cast<AThrowableActor>(HitResult.GetActor()) : nullptr;
@@ -288,7 +288,15 @@ void ATanTrumnCharacterBase::ProcessTraceResult(const FHitResult& HitResult)
 			ThrowableActor->ToggleHighlight(true);
 		}
 	}
+	if (!IsSameActor)
+	{
+		ThrowableActor = HitThrowableActor;
 
+		if (bHighLighting)
+		{
+			ThrowableActor->ToggleHighlight(true);
+		}
+	}
 	if (CharacterThrowState == ECharacterThrowState::RequestingPull)
 	{
 		// Don't allow for pulling objects while running/jogging
@@ -577,14 +585,14 @@ void ATanTrumnCharacterBase::Tick(float DeltaTime)
 
 	if (CharacterThrowState == ECharacterThrowState::Throwing)
 	{
-		/*if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 		{
 			if (UAnimMontage* CurrentAnimMontage = AnimInstance->GetCurrentActiveMontage())
 			{
 				const float PlayRate = AnimInstance->GetCurveValue(TEXT("ThrowCurve"));
 				AnimInstance->Montage_SetPlayRate(CurrentAnimMontage, PlayRate);
 			}
-		}*/
+		}
 	}
 
 
@@ -671,6 +679,31 @@ void ATanTrumnCharacterBase::EndEffect()
 	}
 }
 
+bool ATanTrumnCharacterBase::AttemptPullObjectAtLocation(const FVector& InLocation)
+{
+	if (CharacterThrowState != ECharacterThrowState::None || CharacterThrowState != ECharacterThrowState::RequestingPull)
+	{
+		return false;
+		
+	}
 
+	FVector StartPos = GetActorLocation();
+	FVector EndPos = InLocation;
+	FHitResult HitResult;
+	GetWorld() ? GetWorld()->LineTraceSingleByChannel(HitResult, StartPos, EndPos, ECollisionChannel::ECC_Visibility) : false;
+#if ENABLE_DRAW_DEBUG
+	if (CVarDisplayTrace->GetBool())
+	{
+		DrawDebugLine(GetWorld(), StartPos, EndPos, HitResult.bBlockingHit ? FColor::Red : FColor::White, false);
+	}
+#endif
+	CharacterThrowState = ECharacterThrowState::RequestingPull;
+	ProcessTraceResult(HitResult,false);
+	if (CharacterThrowState == ECharacterThrowState::Pulling)
+	{
+		return true;
+	}
+	CharacterThrowState = ECharacterThrowState::None;
+	return false;
 
-
+}

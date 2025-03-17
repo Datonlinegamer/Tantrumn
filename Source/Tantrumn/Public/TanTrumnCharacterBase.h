@@ -68,7 +68,7 @@ public:
 	UAnimMontage* CelebrateMontage = nullptr;
 	void RequestThrowObject();
 	void RequestPullObjectStart();
-	void ProcessTraceResult(const FHitResult& HitResult);
+	void ProcessTraceResult(const FHitResult& HitResult, bool bHighLighting =true);
 	void RequestPullObjectStop();
 	void RequestUsetObject();
 	UFUNCTION()
@@ -93,8 +93,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRequestPullObject(bool bIsPulling);
 
-	
-
+	UFUNCTION(BlueprintCallable)
+	bool AttemptPullObjectAtLocation(const FVector& InLocation);
+		
 	UFUNCTION(Client, Reliable)
 	void ClientThrowableAttached(AThrowableActor* InThrowableActor);
 

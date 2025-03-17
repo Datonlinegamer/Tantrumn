@@ -18,7 +18,6 @@ enum class EGameState : uint8
  * 
  */
 class ATanTrumnCharacterBase;
-
 class UTantrumnGameWidget;
 UCLASS()
 class TANTRUMN_API ATantrumnGameModeBase : public AGameModeBase
