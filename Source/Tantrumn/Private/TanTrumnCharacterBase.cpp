@@ -129,8 +129,24 @@ void ATanTrumnCharacterBase::ResetThrowableObject()
 	CharacterThrowState = ECharacterThrowState::None;
 	ThrowableActor = nullptr;
 }
+void ATanTrumnCharacterBase::RequestStopAiming()
+{
+	if (CharacterThrowState == ECharacterThrowState::Aiming)
+	{
+		CharacterThrowState = ECharacterThrowState::Attached;
+		ServerRequestToggleAim(false);
+	}
+}
+void ATanTrumnCharacterBase::ServerRequestToggleAim_Implementation(bool IsAiming)
+{
+	CharacterThrowState = IsAiming ? ECharacterThrowState::Aiming : ECharacterThrowState::Aiming;
+}
 void ATanTrumnCharacterBase::RequestThrowObject()
 {
+
+	if (CharacterThrowState == ECharacterThrowState::Attached)
+	{
+	
 		if (CanThrowObject())
 		{
 			if (PlayThrowMontage())
@@ -144,6 +160,7 @@ void ATanTrumnCharacterBase::RequestThrowObject()
 			}
 		}
 	
+	}
 }
 
 void ATanTrumnCharacterBase::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -261,6 +278,7 @@ void ATanTrumnCharacterBase::RequestPullObjectStart()
 	if (!bIsStunned && CharacterThrowState == ECharacterThrowState::None)
 	{
 		CharacterThrowState = ECharacterThrowState::RequestingPull;
+		ServerRequestPullObject(true);
 	}
 }
 void ATanTrumnCharacterBase::ProcessTraceResult(const FHitResult& HitResult,bool bHighLighting)
@@ -294,7 +312,11 @@ void ATanTrumnCharacterBase::ProcessTraceResult(const FHitResult& HitResult,bool
 
 		if (bHighLighting)
 		{
-			ThrowableActor->ToggleHighlight(true);
+			if (ThrowableActor)
+			{
+				ThrowableActor->ToggleHighlight(true);
+
+			}
 		}
 	}
 	if (CharacterThrowState == ECharacterThrowState::RequestingPull)
@@ -453,6 +475,15 @@ void ATanTrumnCharacterBase::OnNotifyBeginReceived(FName NotifyName, const FBran
 	{
 		const FVector Start = GetMesh()->GetSocketLocation(TEXT("Objectsocket"));
 		DrawDebugLine(GetWorld(), Start, Start + Direction, FColor::Red, false, 5.0f);
+	}
+}
+
+void ATanTrumnCharacterBase::RequestAim()
+{
+	if (!bIsStunned && CharacterThrowState == ECharacterThrowState::Attached)
+	{
+		CharacterThrowState = ECharacterThrowState::Aiming;
+		ServerRequestToggleAim(true);
 	}
 }
 
@@ -681,7 +712,7 @@ void ATanTrumnCharacterBase::EndEffect()
 
 bool ATanTrumnCharacterBase::AttemptPullObjectAtLocation(const FVector& InLocation)
 {
-	if (CharacterThrowState != ECharacterThrowState::None || CharacterThrowState != ECharacterThrowState::RequestingPull)
+	if (CharacterThrowState != ECharacterThrowState::None && CharacterThrowState != ECharacterThrowState::RequestingPull)
 	{
 		return false;
 		

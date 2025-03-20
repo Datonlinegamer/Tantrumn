@@ -75,5 +75,6 @@ void UTanTrumnPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			Interact = true;
 		}
 			
+		bAimingObject = Player->CanAim();
 	}
 }

@@ -220,6 +220,23 @@ void ATanTrumnPlayerController::ToggleCrouch()
         PC->BaseCharacterCrouch();
     }
 }
+void ATanTrumnPlayerController::AimingObject()
+{
+    // need CanProcessReqeust();
+    /*if ()
+    {
+
+    }*/
+    if (PC->CanAim())
+    {
+        PC->RequestAim();
+    }
+    else
+    {
+        PC->RequestPullObjectStart();
+    }
+}
+
 void ATanTrumnPlayerController::RequestPullObjectStart(const FInputActionValue& Value)
 {
     if (!GameModeRef || GameModeRef->GetCurrentGameState() != EGameState::Playing) { return; }
@@ -268,7 +285,8 @@ void ATanTrumnPlayerController::SetupInputComponent()
         Input->BindAction(CrouchAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::ToggleCrouch);
         Input->BindAction(PullAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::RequestPullObjectStart);
         Input->BindAction(PullAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::RequestPullObjectStart);
-        Input->BindAction(ThrowAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::PlayerThrowObject);
+        Input->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ATanTrumnPlayerController::PlayerThrowObject);
+        Input->BindAction(AimAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::AimingObject);
         
     }
 }

@@ -42,6 +42,7 @@ protected:
 	void Walking();
 	void StopJumping();
 	void ToggleCrouch();
+	void AimingObject();
 	virtual void BeginPlay() override;
 
 	void OnPossess(APawn* aPawn);
@@ -91,6 +92,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* ThrowAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* AimAction;
 
 
 	ATantrumnGameModeBase* GameModeRef;

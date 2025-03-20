@@ -46,6 +46,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
 	 bool Hovering;
+	 
+	 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
+	 bool bAimingObject;
 	
 	 
 protected:
