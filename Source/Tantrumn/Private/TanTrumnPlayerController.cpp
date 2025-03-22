@@ -227,7 +227,7 @@ void ATanTrumnPlayerController::AimingObject()
     {
 
     }*/
-    if (PC->CanAim())
+    if (!PC->IsAiming())
     {
         PC->RequestAim();
     }

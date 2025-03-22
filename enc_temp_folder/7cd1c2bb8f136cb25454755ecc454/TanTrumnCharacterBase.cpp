@@ -420,7 +420,7 @@ void ATanTrumnCharacterBase::ClientThrowableAttached_Implementation(AThrowableAc
 
 void ATanTrumnCharacterBase::ServerBeginThrow_Implementation()
 {
-		if (ThrowableActor->GetRootComponent())
+	if (ThrowableActor->GetRootComponent())
 	{
 		UPrimitiveComponent* RootPrimitiveComponent = Cast<UPrimitiveComponent>(ThrowableActor->GetRootComponent());
 		if (RootPrimitiveComponent)
