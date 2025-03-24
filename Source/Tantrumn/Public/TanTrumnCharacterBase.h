@@ -67,7 +67,7 @@ public:
 	void ServerRequestToggleAim(bool IsAiming);
 
 	void RequestStopAiming();
-
+	bool bWantsToAim =false;
 	UFUNCTION(BlueprintPure)
 	bool CanAim() const { return CharacterThrowState == ECharacterThrowState::Attached; }
 	UFUNCTION(BlueprintPure)
@@ -121,7 +121,6 @@ public:
 	void OnNotifyEndRecieved(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
 	void UpdateStun();
-	bool bIsAiming;
 	void OnStunEnd();
 	void OnRep_CharacterThrowState(const ECharacterThrowState& OldCharacterThrowState);
 	float StunTime = 0.0f;

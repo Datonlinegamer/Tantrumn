@@ -27,6 +27,7 @@ public:
 	bool pull;
 	void Sprinting();
 	void ClientReachedEnd_Implementation();
+	
 protected:
 	float GroundCheckDistance = 100.0f;
 	void Move(const FInputActionValue& Value);
@@ -42,7 +43,7 @@ protected:
 	void Walking();
 	void StopJumping();
 	void ToggleCrouch();
-	void AimingObject();
+	void AimingObject(const FInputActionValue& Value);
 	virtual void BeginPlay() override;
 
 	void OnPossess(APawn* aPawn);

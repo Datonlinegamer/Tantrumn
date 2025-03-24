@@ -35,8 +35,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
 	bool Interact;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
-	bool isAiming;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "float")
 	float PlayerSpeed;

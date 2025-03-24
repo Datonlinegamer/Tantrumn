@@ -153,12 +153,12 @@ void ATanTrumnCharacterBase::RequestThrowObject()
 		return;
 	}
 
-	if (!IsAiming())
+	/*if (!IsAiming())
 	{
 		CharacterThrowState = ECharacterThrowState::Aiming;
-	}
+	}*/
 
-	if (CanThrowObject() && CanAim())  // Ensure we can still throw and aim
+	if (CanThrowObject() && CanAim()) 
 	{
 		CharacterThrowState = ECharacterThrowState::Throwing;
 		ServerRequestThrowObject();
