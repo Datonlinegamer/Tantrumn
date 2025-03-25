@@ -129,6 +129,7 @@ void ATanTrumnCharacterBase::ResetThrowableObject()
 	CharacterThrowState = ECharacterThrowState::None;
 	ThrowableActor = nullptr;
 }
+
 void ATanTrumnCharacterBase::RequestStopAiming()
 {
 	if (CharacterThrowState == ECharacterThrowState::Aiming)
@@ -139,7 +140,7 @@ void ATanTrumnCharacterBase::RequestStopAiming()
 }
 void ATanTrumnCharacterBase::ServerRequestToggleAim_Implementation(bool IsAiming)
 {
-	CharacterThrowState = IsAiming ? ECharacterThrowState::Aiming : ECharacterThrowState::Aiming;
+	CharacterThrowState = IsAiming ? ECharacterThrowState::Aiming : ECharacterThrowState::Attached;
 }
 void ATanTrumnCharacterBase::RequestThrowObject()
 {

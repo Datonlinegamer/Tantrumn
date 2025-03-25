@@ -226,23 +226,39 @@ void ATanTrumnPlayerController::AimingObject(const FInputActionValue& Value)
 
     bool bInputAiming = Value.Get<bool>(); 
 
+    if(!bInputAiming)  
+    {
+        
         if (PC->CanAim())
         {
           
+            PC->bWantsToAim = true;
             PC->RequestAim();
 
         }
         else
         {
+            PC->bWantsToAim = false;
             PC->RequestPullObjectStart();
         }
-            PC->bWantsToAim =! PC->bWantsToAim;
-    
+    }
 }
    
         
     
     
+                
+                
+
+                
+
+    
+    
+
+
+
+
+
 
 void ATanTrumnPlayerController::RequestPullObjectStart(const FInputActionValue& Value)
 {
@@ -299,7 +315,7 @@ void ATanTrumnPlayerController::SetupInputComponent()
         Input->BindAction(PullAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::RequestPullObjectStart);
         Input->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ATanTrumnPlayerController::PlayerThrowObject);
         Input->BindAction(AimAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::AimingObject);
-        Input->BindAction(AimAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::AimingObject);
+        //Input->BindAction(AimAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::AimingObject);
         
     }
 }
