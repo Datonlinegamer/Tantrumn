@@ -45,6 +45,7 @@ void UTanTrumnPlayerAnimInstance::PlayerMoveVelocity()
 }
 void UTanTrumnPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
+	Super::NativeUpdateAnimation(DeltaSeconds);
 	PlayerMoveVelocity();	
 	
 	if (GameModeRef)
@@ -75,6 +76,13 @@ void UTanTrumnPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			Interact = true;
 		}
 		
-		bAimingObject = Player->bWantsToAim;
+		
+	
+			bAimingObject = Player->bWantsToAim;
+		
+			if (Player->CanThrowObject())
+			{
+				ThrowOject = true;
+			}
 	}
 }

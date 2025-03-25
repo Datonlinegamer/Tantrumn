@@ -226,23 +226,35 @@ void ATanTrumnPlayerController::AimingObject(const FInputActionValue& Value)
 
     bool bInputAiming = Value.Get<bool>(); // Get the input value
 
-    if (!bInputAiming)
+    if(!bInputAiming)  // If aiming input is active
     {
-        if (!PC->bWantsToAim&&PC->CanAim())
-        {
-            PC->bWantsToAim = true;
-            PC->RequestAim();
-              
-        }
         
+     
+        if (PC->CanAim())
+        {
+            if (!PC->IsAiming())
+            {
+                PC->bWantsToAim = true;
+                PC->RequestAim();
 
-    }
-    else
-    {
-        PC->bWantsToAim = false;
-        PC->RequestStopAiming();
+            }
 
+        }
+        else
+        {
+           if (PC->IsAiming() != false)
+            {
+                PC->bWantsToAim = false;
+                PC->RequestAim();
+
+            }
+        }
+           
+            
+           
+        
     }
+    
                 
                 
 
@@ -273,23 +285,26 @@ void ATanTrumnPlayerController::RequestPullObjectStart(const FInputActionValue& 
 }
 
 void ATanTrumnPlayerController::PlayerThrowObject(const FInputActionValue& Value)
-{
-    if (!PC) { return; } // Ensure PC is valid
+{    if (!PC) { return; }  // Ensure PC is valid
 
     float Axis = Value.Get<float>();
 
-    if (PC->CanThrowObject())
+         if (!PC->CanThrowObject())  // Check if throwing is possible
     {
         if (Axis > 0)
         {
-            PC->RequestThrowObject();
+            PC->ServerBeginThrow(); 
+            //PC->CanAim();
         }
         else
         {
-            PC->RequestUsetObject();
+            PC->RequestUsetObject();  // Request to use the object
         }
     }
-}
+    else
+    {
+    }
+    }
 
 void ATanTrumnPlayerController::SetupInputComponent()
 {
@@ -308,7 +323,7 @@ void ATanTrumnPlayerController::SetupInputComponent()
         Input->BindAction(PullAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::RequestPullObjectStart);
         Input->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &ATanTrumnPlayerController::PlayerThrowObject);
         Input->BindAction(AimAction, ETriggerEvent::Started, this, &ATanTrumnPlayerController::AimingObject);
-       // Input->BindAction(AimAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::AimingObject);
+        Input->BindAction(AimAction, ETriggerEvent::Completed, this, &ATanTrumnPlayerController::AimingObject);
         
     }
 }

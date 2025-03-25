@@ -48,6 +48,9 @@ public:
 	 
 	 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool")
 	 bool bAimingObject;
+	 
+	 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "float")
+	  bool ThrowOject;
 	
 	 
 protected:

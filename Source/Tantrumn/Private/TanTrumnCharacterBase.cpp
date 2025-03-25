@@ -143,31 +143,33 @@ void ATanTrumnCharacterBase::ServerRequestToggleAim_Implementation(bool IsAiming
 }
 void ATanTrumnCharacterBase::RequestThrowObject()
 {
-	if (CharacterThrowState != ECharacterThrowState::Attached)
-	{
-		return;
-	}
+    if (CharacterThrowState != ECharacterThrowState::Attached)
+    {
+        return;
+    }
 
-	if (!CanThrowObject())
-	{
-		return;
-	}
+    if (!CanThrowObject())  // Check if the object can be thrown
+    {
+        return;
+    }
 
-	/*if (!IsAiming())
-	{
-		CharacterThrowState = ECharacterThrowState::Aiming;
-	}*/
+    if (!IsAiming())  // If not aiming, switch to aiming state
+    {
+        CharacterThrowState = ECharacterThrowState::Aiming;
+    }
 
-	if (CanThrowObject() && CanAim()) 
-	{
-		CharacterThrowState = ECharacterThrowState::Throwing;
-		ServerRequestThrowObject();
-	}
-	else
-	{
-		ResetThrowableObject();
-	}
+    // After ensuring we can throw the object and aiming is possible, initiate throwing
+    if (CanAim())  
+    {
+        CharacterThrowState = ECharacterThrowState::Throwing;
+        ServerRequestThrowObject();  // Call the server to handle the throwing action
+    }
+    else  // Reset throwable object if we can't aim
+    {
+        ResetThrowableObject();
+    }
 }
+
 
 void ATanTrumnCharacterBase::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {

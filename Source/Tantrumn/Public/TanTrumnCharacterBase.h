@@ -62,7 +62,7 @@ public:
 	void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 	void RequestAim();
 	void ResetThrowableObject();
-	bool CanThrowObject() const { return CharacterThrowState == ECharacterThrowState::Attached; }
+	bool CanThrowObject() const { return CharacterThrowState == ECharacterThrowState::Throwing; }
 	UFUNCTION(Server, Reliable)
 	void ServerRequestToggleAim(bool IsAiming);
 
