@@ -1,6 +1,6 @@
 # TanTrumn
  
-Tantrum - CGS School projrct ( Multiplayer Game) - Engine UnReal Engine 5
+Tantrum - CGS School project ( Multiplayer Game) - Engine UnReal Engine 5
 Tantrum is an exciting multiplayer game that blends speed, precision, and competition. Players engage in action-packed challenges involving AI opponents and local multiplayer battles.
 
 Features:
